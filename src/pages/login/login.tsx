@@ -1,15 +1,126 @@
-import React from "react";
+import {
+  Layout,
+  Card,
+  Space,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Flex,
+  Alert,
+} from "antd";
+import { LockFilled, LockOutlined, UserOutlined } from "@ant-design/icons";
+import { useMutation } from "@tanstack/react-query";
+import { LoginCredentails } from "../../types";
+import { login } from "../../http/api";
+
+const loginUser = async (loginCredentails: LoginCredentails) => {
+  const { data } = await login(loginCredentails);
+  return data;
+};
 
 const LoginPage = () => {
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationKey: ["Login"],
+    mutationFn: loginUser,
+    onSuccess: async () => {
+      console.log("Login success");
+    },
+  });
+
   return (
     <>
-      <h1>Sign in</h1>
-      <input placeholder="Username"></input>
-      <input placeholder="Password"></input>
-      <button>Log in</button>
-      <label htmlFor="remember-me">Remember me</label>
-      <input type="checkbox" id="remember-me"></input>
-      <a href="#">Forgot password</a>
+      <Layout></Layout>
+      <Layout
+        style={{ height: "100vh", display: "grid", placeItems: "center" }}
+      >
+        <Space direction="vertical" align="center" size="large">
+          <Layout.Content
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <img src="/src/assets/Logo.svg"></img>
+          </Layout.Content>
+          <Card
+            bordered={false}
+            style={{ width: 300 }}
+            title={
+              <Space
+                style={{
+                  width: "100%",
+                  fontSize: 16,
+                  justifyContent: "center",
+                }}
+              >
+                <LockFilled />
+                Sign in
+              </Space>
+            }
+          >
+            {isError && (
+              <Alert
+                style={{ margin: "12px" }}
+                type="error"
+                message={error.message}
+              />
+            )}
+            <Form
+              initialValues={{ remember: true }}
+              onFinish={(values) => {
+                mutate({ email: values.email, password: values.password });
+              }}
+            >
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: "Please input your email!" },
+                  {
+                    type: "email",
+                    message: "Please enter valid email",
+                  },
+                ]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Email" />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Password"
+                />
+              </Form.Item>
+
+              <Flex style={{ justifyContent: "space-between" }}>
+                <Form.Item name="remember" valuePropName="checked" label={null}>
+                  <Checkbox>Remember me</Checkbox>
+                </Form.Item>
+                <a href="" style={{ paddingTop: "5px" }}>
+                  Forgot password
+                </a>
+              </Flex>
+
+              <Form.Item label={null}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  style={{ width: "100%" }}
+                  loading={isPending}
+                >
+                  Log in
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </Space>
+      </Layout>
     </>
   );
 };
