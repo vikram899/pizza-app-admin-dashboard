@@ -3,7 +3,7 @@ export type LoginCredentails = {
   password: string;
 };
 
-export type SelfData = {
+export type User = {
   id: number;
   firstName: string;
   lastName: string;
