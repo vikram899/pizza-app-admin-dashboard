@@ -7,3 +7,4 @@ export const login = (loginCredentails: LoginCredentails) =>
   api.post("/auth/login", loginCredentails);
 
 export const self = () => api.get("/auth/self");
+export const logout = () => api.post("/auth/logout");

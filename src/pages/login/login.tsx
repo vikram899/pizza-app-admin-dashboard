@@ -12,13 +12,16 @@ import {
 import { LockFilled, LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { LoginCredentails } from "../../types";
-import { login, self } from "../../http/api";
-import { useState } from "react";
+import { login, logout, self } from "../../http/api";
 import { useAuthStore } from "../../store";
+import { usePermission } from "../../hooks/usePermission";
 
 const loginUser = async (loginCredentails: LoginCredentails) => {
   const { data } = await login(loginCredentails);
   return data;
+};
+const logoutUser = async () => {
+  await logout();
 };
 
 const getSelf = async () => {
@@ -27,19 +30,35 @@ const getSelf = async () => {
 };
 
 const LoginPage = () => {
-  const { setUser } = useAuthStore();
+  const { setUser, logout: logoutStore } = useAuthStore();
+  const { isAllowed } = usePermission();
 
-  const { data: selfData, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["key"],
     queryFn: getSelf,
     enabled: false, // to not render after component render as we want to trigger this after login
   });
 
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logoutUser,
+    onSuccess: async () => {
+      logoutStore();
+      return;
+    },
+  });
+
   const { mutate, isPending, isError, error } = useMutation({
-    mutationKey: ["Login"],
+    mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
       const { data } = await refetch();
+
+      //Logout or redirect to client UI
+      if (!isAllowed(data)) {
+        logoutMutate();
+        return;
+      }
       setUser(data);
     },
   });
