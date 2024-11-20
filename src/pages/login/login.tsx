@@ -10,21 +10,34 @@ import {
   Alert,
 } from "antd";
 import { LockFilled, LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useMutation } from "@tanstack/react-query";
-import { LoginCredentails } from "../../types";
-import { login } from "../../http/api";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { LoginCredentails, SelfData } from "../../types";
+import { login, self } from "../../http/api";
+import { useState } from "react";
 
 const loginUser = async (loginCredentails: LoginCredentails) => {
   const { data } = await login(loginCredentails);
   return data;
 };
 
+const getSelf = async () => {
+  const { data } = await self();
+  return data;
+};
+
 const LoginPage = () => {
+  const { data: selfData, refetch } = useQuery({
+    queryKey: ["key"],
+    queryFn: getSelf,
+    enabled: false, // to not render after component render as we want to trigger this after login
+  });
+
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["Login"],
     mutationFn: loginUser,
     onSuccess: async () => {
-      console.log("Login success");
+      refetch();
+      console.log("Login success", selfData);
     },
   });
 
