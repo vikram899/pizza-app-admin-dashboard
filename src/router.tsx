@@ -7,11 +7,11 @@ import Root from "./layout/Root";
 
 export const router = createBrowserRouter([
   {
-    path: "",
+    path: "/",
     element: <Root />,
     children: [
       {
-        path: "/",
+        path: "",
         element: <Dashboard />,
         children: [
           {
