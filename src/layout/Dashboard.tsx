@@ -59,7 +59,7 @@ const Dashboard = () => {
     {
       key: "/users",
       icon: <Icon component={UserIcon}></Icon>,
-      label: <NavLink to="/user">Users</NavLink>,
+      label: <NavLink to="/users">Users</NavLink>,
     },
     {
       key: "/restaurants",
@@ -137,7 +137,7 @@ const Dashboard = () => {
               </Space>
             </Flex>
           </Header>
-          <Content style={{ margin: "0 16px" }}>
+          <Content style={{ margin: "24px 16px" }}>
             <Outlet />
           </Content>
           <Footer style={{ textAlign: "center" }}>
