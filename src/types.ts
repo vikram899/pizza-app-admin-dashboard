@@ -9,7 +9,7 @@ export type User = {
   lastName: string;
   email: string;
   role: string;
-  tenant: Tenant;
+  tenant?: Tenant;
 };
 export type Tenant = {
   id: number;
