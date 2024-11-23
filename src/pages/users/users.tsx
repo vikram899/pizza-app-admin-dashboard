@@ -83,10 +83,14 @@ const Users = () => {
             },
           ]}
         ></Breadcrumb>
-        <UserFilter />
+        <UserFilter
+          onFilterChange={(filterName: string, filterValue: string) =>
+            console.log(filterName, filterValue)
+          }
+        />
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
-        <Table columns={columns} dataSource={userData} />;
+        <Table columns={columns} dataSource={userData} rowKey={"id"} />;
       </Space>
     </div>
   );

@@ -28,7 +28,7 @@ const getSelf = async () => {
 };
 
 const LoginPage = () => {
-  const { setUser, logout: logoutStore } = useAuthStore();
+  const { setUser } = useAuthStore();
   const { isAllowed } = usePermission();
   const { logout } = useLogout();
   const { refetch } = useQuery({
