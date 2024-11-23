@@ -3,12 +3,10 @@ import { useAuthStore } from "../store";
 import {
   Avatar,
   Badge,
-  Button,
   Dropdown,
   Flex,
   Layout,
   Menu,
-  Segmented,
   Space,
   theme,
 } from "antd";
@@ -23,6 +21,7 @@ import Home from "../components/icons/Home";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "../http/api";
 import { Roles } from "../constants";
+import menu from "antd/es/menu";
 
 const logoutUser = async () => {
   await logout();
@@ -50,33 +49,43 @@ const Dashboard = () => {
     return <Navigate to="/auth/login" replace={true} />;
   }
 
-  const items = [
-    {
-      key: "/",
-      icon: <Icon component={Home}></Icon>,
-      label: <NavLink to="/">Home</NavLink>,
-    },
-    {
-      key: "/users",
-      icon: <Icon component={UserIcon}></Icon>,
-      label: <NavLink to="/users">Users</NavLink>,
-    },
-    {
-      key: "/restaurants",
-      icon: <Icon component={foodIcon}></Icon>,
-      label: <NavLink to="/restaurants">Restaurants</NavLink>,
-    },
-    {
-      key: "/products",
-      icon: <Icon component={BasketIcon}></Icon>,
-      label: <NavLink to="/products">Products</NavLink>,
-    },
-    {
-      key: "/promos",
-      icon: <Icon component={GiftIcon}></Icon>,
-      label: <NavLink to="/promos">Promos</NavLink>,
-    },
-  ];
+  const getMenuItems = (role: string) => {
+    const baseItems = [
+      {
+        key: "/",
+        icon: <Icon component={Home}></Icon>,
+        label: <NavLink to="/">Home</NavLink>,
+      },
+      {
+        key: "/restaurants",
+        icon: <Icon component={foodIcon}></Icon>,
+        label: <NavLink to="/restaurants">Restaurants</NavLink>,
+      },
+      {
+        key: "/products",
+        icon: <Icon component={BasketIcon}></Icon>,
+        label: <NavLink to="/products">Products</NavLink>,
+      },
+      {
+        key: "/promos",
+        icon: <Icon component={GiftIcon}></Icon>,
+        label: <NavLink to="/promos">Promos</NavLink>,
+      },
+    ];
+
+    if (role === Roles.Admin) {
+      const menu = [...baseItems];
+      menu.splice(1, 0, {
+        key: "/users",
+        icon: <Icon component={UserIcon}></Icon>,
+        label: <NavLink to="/users">Users</NavLink>,
+      });
+      return menu;
+    }
+    return baseItems;
+  };
+
+  const items = getMenuItems(user.role);
 
   return (
     <div>

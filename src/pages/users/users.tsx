@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Breadcrumb, Space, Table } from "antd";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { getAllUsers } from "../../http/api";
 import { User } from "../../types";
+import { useAuthStore } from "../../store";
+import { Roles } from "../../constants";
 
 const getUsers = async () => {
   const users = await getAllUsers();
@@ -19,6 +21,12 @@ const Users = () => {
     queryKey: ["uses"],
     queryFn: getUsers,
   });
+
+  const { user } = useAuthStore();
+
+  if (user?.role !== Roles.Admin) {
+    return <Navigate to="/" replace={true}></Navigate>;
+  }
 
   const columns = [
     {
@@ -54,7 +62,7 @@ const Users = () => {
     {
       title: "Tenant",
       key: "tenant",
-      render: (text: any, record: User) => {
+      render: (record: User) => {
         return record.tenant ? record.tenant.name : "No Tenant";
       },
     },
