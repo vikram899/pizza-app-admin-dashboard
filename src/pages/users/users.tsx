@@ -5,6 +5,7 @@ import { getAllUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "../../store";
 import { Roles } from "../../constants";
+import UserFilter from "./userFilter";
 
 const getUsers = async () => {
   const users = await getAllUsers();
@@ -82,6 +83,7 @@ const Users = () => {
             },
           ]}
         ></Breadcrumb>
+        <UserFilter />
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
         <Table columns={columns} dataSource={userData} />;

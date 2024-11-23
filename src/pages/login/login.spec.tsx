@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import LoginPage from "./login";
+import LoginPage from "./Login";
 
 // Create a QueryClient instance
 const queryClient = new QueryClient();
