@@ -18,28 +18,13 @@ import BasketIcon from "../components/icons/BasketIcon";
 import { foodIcon } from "../components/icons/FoodIcon";
 import UserIcon from "../components/icons/UserIcon";
 import Home from "../components/icons/Home";
-import { useMutation } from "@tanstack/react-query";
-import { logout } from "../http/api";
 import { Roles } from "../constants";
-import menu from "antd/es/menu";
-
-const logoutUser = async () => {
-  await logout();
-};
+import useLogout from "../hooks/useLogout";
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { user, logout: logoutStore } = useAuthStore();
-
-  const { mutate: logoutMutate } = useMutation({
-    mutationKey: ["logout"],
-    mutationFn: logoutUser,
-    onSuccess: async () => {
-      logoutStore();
-      return;
-    },
-  });
-
+  const { user } = useAuthStore();
+  const { logout } = useLogout();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -131,7 +116,7 @@ const Dashboard = () => {
                       {
                         key: "logout",
                         label: "logout",
-                        onClick: () => logoutMutate(),
+                        onClick: () => logout(),
                       },
                     ],
                   }}
