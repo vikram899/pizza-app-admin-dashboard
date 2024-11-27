@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Breadcrumb, Button, Drawer, Space, Table, theme, Form } from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { getAllUsers } from "../../http/api";
-import { User } from "../../types";
+import { createUser, getAllUsers } from "../../http/api";
+import { CreateUserType, User } from "../../types";
 import { useAuthStore } from "../../store";
 import { Roles } from "../../constants";
 import UserFilter from "./UserFilter";
@@ -16,7 +16,10 @@ const getUsers = async () => {
 };
 
 const Users = () => {
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const queryClient = useQueryClient();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [form] = Form.useForm();
+
   const {
     data: userData,
     isLoading,
@@ -76,6 +79,27 @@ const Users = () => {
     },
   ];
 
+  const addUser = async (creatUserData: CreateUserType) => {
+    const { data } = await createUser(creatUserData);
+    return data;
+  };
+
+  const { mutate: userMutate } = useMutation({
+    mutationKey: ["user"],
+    mutationFn: addUser,
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDrawerOpen(false);
+      form.resetFields();
+      return;
+    },
+  });
+
+  const onHandleSubmit = async () => {
+    await form.validateFields();
+    userMutate(form.getFieldsValue());
+  };
+
   return (
     <div>
       <Space style={{ width: "100%" }} size={"large"} direction={"vertical"}>
@@ -112,12 +136,22 @@ const Users = () => {
           destroyOnClose={true}
           onClose={() => {
             setDrawerOpen(false);
+            form.resetFields();
           }}
           open={drawerOpen}
           extra={
             <Space>
-              <Button>Cancel</Button>
-              <Button type="primary">Submit</Button>
+              <Button
+                onClick={() => {
+                  setDrawerOpen(false);
+                  form.resetFields();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" onClick={onHandleSubmit}>
+                Submit
+              </Button>
             </Space>
           }
           styles={{
@@ -126,7 +160,7 @@ const Users = () => {
             },
           }}
         >
-          <Form layout="vertical">
+          <Form layout="vertical" form={form}>
             <UserForm />
           </Form>
         </Drawer>

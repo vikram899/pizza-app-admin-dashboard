@@ -2,6 +2,13 @@ export type LoginCredentails = {
   email: string;
   password: string;
 };
+export type CreateUserType = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  tenant?: number;
+};
 
 export type User = {
   id: number;
