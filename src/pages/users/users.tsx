@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Space, Table } from "antd";
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { getAllUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "../../store";
 import { Roles } from "../../constants";
 import UserFilter from "./userFilter";
+import { useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
 
 const getUsers = async () => {
   const users = await getAllUsers();
@@ -13,6 +15,7 @@ const getUsers = async () => {
 };
 
 const Users = () => {
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const {
     data: userData,
     isLoading,
@@ -87,10 +90,40 @@ const Users = () => {
           onFilterChange={(filterName: string, filterValue: string) =>
             console.log(filterName, filterValue)
           }
-        />
+        >
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setDrawerOpen(true)}
+          >
+            Add User
+          </Button>
+        </UserFilter>
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
         <Table columns={columns} dataSource={userData} rowKey={"id"} />;
+        <Drawer
+          title="Create user"
+          width={720}
+          destroyOnClose={true}
+          onClose={() => {
+            setDrawerOpen(false);
+          }}
+          open={drawerOpen}
+          extra={
+            <Space>
+              <Button>Cancel</Button>
+              <Button type="primary">Submit</Button>
+            </Space>
+          }
+        >
+          <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Est
+            similique, harum cum cupiditate ut iusto impedit, labore nihil,
+            veritatis illo ipsum nesciunt. Culpa sit recusandae molestiae est,
+            doloribus quasi dolore?
+          </p>
+        </Drawer>
       </Space>
     </div>
   );
