@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
+import { Breadcrumb, Button, Drawer, Space, Table, theme, Form } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { getAllUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "../../store";
 import { Roles } from "../../constants";
-import UserFilter from "./userFilter";
+import UserFilter from "./UserFilter";
 import { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
+import UserForm from "./forms/UserForm";
 
 const getUsers = async () => {
   const users = await getAllUsers();
@@ -22,10 +23,13 @@ const Users = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["uses"],
+    queryKey: ["users"],
     queryFn: getUsers,
   });
 
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
   const { user } = useAuthStore();
 
   if (user?.role !== Roles.Admin) {
@@ -116,13 +120,15 @@ const Users = () => {
               <Button type="primary">Submit</Button>
             </Space>
           }
+          styles={{
+            body: {
+              background: colorBgLayout,
+            },
+          }}
         >
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Est
-            similique, harum cum cupiditate ut iusto impedit, labore nihil,
-            veritatis illo ipsum nesciunt. Culpa sit recusandae molestiae est,
-            doloribus quasi dolore?
-          </p>
+          <Form layout="vertical">
+            <UserForm />
+          </Form>
         </Drawer>
       </Space>
     </div>

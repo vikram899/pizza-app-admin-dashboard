@@ -9,3 +9,4 @@ export const login = (loginCredentails: LoginCredentails) =>
 export const self = () => api.get("/auth/self");
 export const logout = () => api.post("/auth/logout");
 export const getAllUsers = () => api.get("/users");
+export const getAllTenants = () => api.get("/tenants");
