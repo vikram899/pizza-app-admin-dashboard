@@ -17,7 +17,7 @@ import {
 } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { createUser, getAllUsers } from "../../http/api";
-import { CreateUserType, User } from "../../types";
+import { CreateUserType, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import { PER_PAGE, Roles } from "../../constants";
 import UserFilter from "./UserFilter";
@@ -26,9 +26,14 @@ import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
 
 const getUsers = async (queryParams: any) => {
+  const filteredParams = Object.entries(
+    Object.entries(queryParams).filter((item) => !!item[1])
+  );
+
   const queryString = new URLSearchParams(
-    queryParams as unknown as Record<string, string>
+    filteredParams as unknown as Record<string, string>
   ).toString();
+
   const users = await getAllUsers(queryString);
   return users?.data;
 };
@@ -37,6 +42,7 @@ const Users = () => {
   const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
   const [queryParams, setQueryParmas] = useState({
     currentPage: 1,
     perPage: PER_PAGE,
@@ -44,7 +50,6 @@ const Users = () => {
 
   const {
     data: userData,
-    isLoading,
     isError,
     error,
     isFetching,
@@ -124,6 +129,14 @@ const Users = () => {
     userMutate(form.getFieldsValue());
   };
 
+  const onFilterChange = async (changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields
+      .map((item) => ({ [item.name[0]]: item.value }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
+
+    setQueryParmas((prev) => ({ ...prev, ...changedFilterFields }));
+  };
+
   return (
     <div>
       <Space style={{ width: "100%" }} size={"large"} direction={"vertical"}>
@@ -138,19 +151,17 @@ const Users = () => {
             },
           ]}
         ></Breadcrumb>
-        <UserFilter
-          onFilterChange={(filterName: string, filterValue: string) =>
-            console.log(filterName, filterValue)
-          }
-        >
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setDrawerOpen(true)}
-          >
-            Add User
-          </Button>
-        </UserFilter>
+        <Form form={filterForm} onFieldsChange={onFilterChange}>
+          <UserFilter>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setDrawerOpen(true)}
+            >
+              Add User
+            </Button>
+          </UserFilter>
+        </Form>
         {isFetching && (
           <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
         )}

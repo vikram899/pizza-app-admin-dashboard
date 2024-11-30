@@ -28,3 +28,8 @@ export type CreateTenantType = {
   name: string;
   address: string;
 };
+
+export type FieldData = {
+  name: string[];
+  value?: string;
+};

@@ -1,40 +1,39 @@
-import { Card, Col, Row, Input, Select } from "antd";
+import { Card, Col, Row, Input, Select, Form } from "antd";
 import { Roles } from "../../constants";
 
 type UserFilterProp = {
   children: React.ReactNode;
-  onFilterChange: (filterName: string, filterValue: string) => void;
 };
 
-const UserFilter = ({ onFilterChange, children }: UserFilterProp) => {
+const UserFilter = ({ children }: UserFilterProp) => {
   return (
     <Card>
       <Row justify={"space-between"}>
         <Col span={16}>
           <Row gutter={20}>
             <Col span={8}>
-              <Input.Search
-                allowClear={true}
-                placeholder="Search"
-                onChange={(e) => onFilterChange("searchFilter", e.target.value)}
-              ></Input.Search>
+              <Form.Item name="q">
+                <Input.Search
+                  allowClear={true}
+                  placeholder="Search"
+                ></Input.Search>
+              </Form.Item>
             </Col>
             <Col span={8}>
-              <Select
-                placeholder="Select role"
-                allowClear={true}
-                style={{ width: "100%" }}
-                onChange={(selectedItem) =>
-                  onFilterChange("roleFilter", selectedItem)
-                }
-              >
-                <Select.Option value={Roles.Admin}>Admin</Select.Option>
-                <Select.Option value={Roles.Manager}>Manager</Select.Option>
-                <Select.Option value={Roles.Customer}>Customer</Select.Option>
-              </Select>
+              <Form.Item name="role">
+                <Select
+                  placeholder="Select role"
+                  allowClear={true}
+                  style={{ width: "100%" }}
+                >
+                  <Select.Option value={Roles.Admin}>Admin</Select.Option>
+                  <Select.Option value={Roles.Manager}>Manager</Select.Option>
+                  <Select.Option value={Roles.Customer}>Customer</Select.Option>
+                </Select>
+              </Form.Item>
             </Col>
             <Col span={8}>
-              <Select
+              {/* <Select
                 placeholder="Select status"
                 allowClear={true}
                 style={{ width: "100%" }}
@@ -44,7 +43,7 @@ const UserFilter = ({ onFilterChange, children }: UserFilterProp) => {
               >
                 <Select.Option value="ban">Ban</Select.Option>
                 <Select.Option value="active">Active</Select.Option>
-              </Select>
+              </Select> */}
             </Col>
           </Row>
         </Col>
