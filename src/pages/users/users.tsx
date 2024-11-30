@@ -4,21 +4,28 @@ import { Link, Navigate } from "react-router-dom";
 import { createUser, getAllUsers } from "../../http/api";
 import { CreateUserType, User } from "../../types";
 import { useAuthStore } from "../../store";
-import { Roles } from "../../constants";
+import { PER_PAGE, Roles } from "../../constants";
 import UserFilter from "./UserFilter";
 import { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
 
-const getUsers = async () => {
-  const users = await getAllUsers();
-  return users.data;
+const getUsers = async (queryParams: any) => {
+  const queryString = new URLSearchParams(
+    queryParams as unknown as Record<string, string>
+  ).toString();
+  const users = await getAllUsers(queryString);
+  return users?.data;
 };
 
 const Users = () => {
   const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [form] = Form.useForm();
+  const [queryParams, setQueryParmas] = useState({
+    currentPage: 1,
+    perPage: PER_PAGE,
+  });
 
   const {
     data: userData,
@@ -26,8 +33,8 @@ const Users = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
+    queryKey: ["users", queryParams],
+    queryFn: () => getUsers(queryParams),
   });
 
   const {
@@ -129,7 +136,25 @@ const Users = () => {
         </UserFilter>
         {isLoading && <div>Loading...</div>}
         {isError && <div>{error.message}</div>}
-        <Table columns={columns} dataSource={userData} rowKey={"id"} />;
+        <Table
+          columns={columns}
+          dataSource={userData?.data}
+          rowKey={"id"}
+          pagination={{
+            total: userData?.total,
+            pageSize: queryParams.perPage,
+            current: queryParams.currentPage,
+            onChange: (page) => {
+              setQueryParmas((prev) => {
+                return {
+                  ...prev,
+                  currentPage: page,
+                };
+              });
+            },
+          }}
+        />
+        ;
         <Drawer
           title="Create user"
           width={720}

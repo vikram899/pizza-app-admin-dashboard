@@ -3,3 +3,5 @@ export const Roles = {
   Customer: "customer",
   Manager: "manager",
 };
+
+export const PER_PAGE = 6;
