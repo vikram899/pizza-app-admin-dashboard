@@ -1,5 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Breadcrumb, Button, Drawer, Space, Table, theme, Form } from "antd";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  Breadcrumb,
+  Button,
+  Drawer,
+  Space,
+  Table,
+  theme,
+  Form,
+  Spin,
+  Typography,
+} from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { createUser, getAllUsers } from "../../http/api";
 import { CreateUserType, User } from "../../types";
@@ -7,7 +22,7 @@ import { useAuthStore } from "../../store";
 import { PER_PAGE, Roles } from "../../constants";
 import UserFilter from "./UserFilter";
 import { useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
 
 const getUsers = async (queryParams: any) => {
@@ -32,9 +47,11 @@ const Users = () => {
     isLoading,
     isError,
     error,
+    isFetching,
   } = useQuery({
     queryKey: ["users", queryParams],
     queryFn: () => getUsers(queryParams),
+    placeholderData: keepPreviousData,
   });
 
   const {
@@ -134,8 +151,12 @@ const Users = () => {
             Add User
           </Button>
         </UserFilter>
-        {isLoading && <div>Loading...</div>}
-        {isError && <div>{error.message}</div>}
+        {isFetching && (
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        )}
+        {isError && (
+          <Typography.Text type="danger">{error.message}</Typography.Text>
+        )}
         <Table
           columns={columns}
           dataSource={userData?.data}
