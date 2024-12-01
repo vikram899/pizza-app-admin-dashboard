@@ -21,12 +21,13 @@ import { CreateUserType, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import { PER_PAGE, Roles } from "../../constants";
 import UserFilter from "./UserFilter";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import UserForm from "./forms/UserForm";
+import { debounce } from "lodash";
 
 const getUsers = async (queryParams: any) => {
-  const filteredParams = Object.entries(
+  const filteredParams = Object.fromEntries(
     Object.entries(queryParams).filter((item) => !!item[1])
   );
 
@@ -129,12 +130,22 @@ const Users = () => {
     userMutate(form.getFieldsValue());
   };
 
+  const debounceQUpdate = useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParmas((prev) => ({ ...prev, q: value }));
+    }, 1000);
+  }, []);
+
   const onFilterChange = async (changedFields: FieldData[]) => {
     const changedFilterFields = changedFields
       .map((item) => ({ [item.name[0]]: item.value }))
       .reduce((acc, item) => ({ ...acc, ...item }), {});
 
-    setQueryParmas((prev) => ({ ...prev, ...changedFilterFields }));
+    if ("q" in changedFilterFields) {
+      debounceQUpdate(changedFilterFields.q);
+    } else {
+      setQueryParmas((prev) => ({ ...prev, ...changedFilterFields }));
+    }
   };
 
   return (
