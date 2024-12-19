@@ -132,8 +132,8 @@ const Users = () => {
 
   const debounceQUpdate = useMemo(() => {
     return debounce((value: string | undefined) => {
-      setQueryParmas((prev) => ({ ...prev, q: value }));
-    }, 1000);
+      setQueryParmas((prev) => ({ ...prev, q: value, currentPage: 1 }));
+    }, 200);
   }, []);
 
   const onFilterChange = async (changedFields: FieldData[]) => {
@@ -144,7 +144,11 @@ const Users = () => {
     if ("q" in changedFilterFields) {
       debounceQUpdate(changedFilterFields.q);
     } else {
-      setQueryParmas((prev) => ({ ...prev, ...changedFilterFields }));
+      setQueryParmas((prev) => ({
+        ...prev,
+        ...changedFilterFields,
+        currentPage: 1,
+      }));
     }
   };
 

@@ -1,17 +1,25 @@
 import { Space, Breadcrumb, Table, Button, Drawer, theme, Form } from "antd";
 import { Link } from "react-router-dom";
-import { CreateTenantType, Tenant } from "../../types";
+import { CreateTenantType, FieldData, Tenant } from "../../types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTenant, getAllTenants } from "../../http/api";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import RestaurantFilter from "./RestaurantFilter";
 import { PlusOutlined } from "@ant-design/icons";
 import RestaurantForm from "./forms/RestaurantForm";
+import { PER_PAGE } from "../../constants";
+import { debounce } from "lodash";
 
 const Restaurants = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
+
+  const [queryParams, setQueryParmas] = useState({
+    currentPage: 1,
+    perPage: PER_PAGE,
+  });
+
   const columns = [
     {
       title: "Id",
@@ -40,9 +48,17 @@ const Restaurants = () => {
     token: { colorBgLayout },
   } = theme.useToken();
 
-  const getTenants = async () => {
-    const { data } = await getAllTenants();
-    return data.tenants;
+  const getTenants = async (queryParams: any) => {
+    const filteredParams = Object.fromEntries(
+      Object.entries(queryParams).filter((item) => !!item[1])
+    );
+
+    const queryString = new URLSearchParams(
+      filteredParams as unknown as Record<string, string>
+    ).toString();
+
+    const tenants = await getAllTenants(queryString);
+    return tenants.data.data;
   };
 
   const addRestaurant = async (creatTenantData: CreateTenantType) => {
@@ -73,9 +89,29 @@ const Restaurants = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["tenants"],
-    queryFn: getTenants,
+    queryKey: ["tenants", queryParams],
+    queryFn: () => getTenants(queryParams),
   });
+  const [filterForm] = Form.useForm();
+
+  const debounceQUpdate = useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParmas((prev) => ({ ...prev, q: value }));
+    }, 1000);
+  }, []);
+
+  const onFilterChange = async (changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields
+      .map((item) => ({ [item.name[0]]: item.value }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
+    if ("q" in changedFilterFields) {
+      console.log(changedFilterFields.q);
+      debounceQUpdate(changedFilterFields.q);
+    } else {
+      setQueryParmas((prev) => ({ ...prev, ...changedFilterFields }));
+    }
+  };
+
   return (
     <div>
       <div>
@@ -91,22 +127,37 @@ const Restaurants = () => {
               },
             ]}
           ></Breadcrumb>
-          <RestaurantFilter
-            onFilterChange={(filterName: string, filterValue: string) =>
-              console.log(filterName, filterValue)
-            }
-          >
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setDrawerOpen(true)}
-            >
-              Add Restaurant
-            </Button>
-          </RestaurantFilter>
+          <Form form={filterForm} onFieldsChange={onFilterChange}>
+            <RestaurantFilter>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setDrawerOpen(true)}
+              >
+                Add Restaurant
+              </Button>
+            </RestaurantFilter>
+          </Form>
           {isLoading && <div>Loading...</div>}
           {isError && <div>{error.message}</div>}
-          <Table columns={columns} dataSource={tenantData} />
+          <Table
+            columns={columns}
+            dataSource={tenantData}
+            rowKey={"id"}
+            pagination={{
+              total: tenantData?.total,
+              pageSize: queryParams.perPage,
+              current: queryParams.currentPage,
+              onChange: (page) => {
+                setQueryParmas((prev) => {
+                  return {
+                    ...prev,
+                    currentPage: page,
+                  };
+                });
+              },
+            }}
+          />
           <Drawer
             title="Create tenant"
             width={720}
