@@ -31,7 +31,7 @@ const Dashboard = () => {
   } = theme.useToken();
 
   const { Header, Content, Footer, Sider } = Layout;
-  console.log(location.pathname);
+
   if (!user) {
     return (
       <Navigate
@@ -93,7 +93,7 @@ const Dashboard = () => {
           </div>
           <Menu
             theme="light"
-            defaultSelectedKeys={["/"]}
+            defaultSelectedKeys={[location.pathname]}
             mode="inline"
             items={items}
           />

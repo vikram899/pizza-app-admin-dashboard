@@ -7,7 +7,7 @@ const NonAuth = () => {
   if (user) {
     const returnTo =
       new URLSearchParams(location.search).get("returnTo") || "/";
-    console.log(returnTo);
+
     return <Navigate to={returnTo} replace={true} />;
   }
 
