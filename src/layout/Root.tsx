@@ -11,6 +11,7 @@ const getSelf = async () => {
 };
 
 const Root = () => {
+  console.log("Rppt elem");
   const { setUser } = useAuthStore();
 
   const { data, isLoading } = useQuery({

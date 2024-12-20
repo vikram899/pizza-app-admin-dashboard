@@ -4,7 +4,7 @@ import LoginPage from "./pages/login/Login";
 import Dashboard from "./layout/Dashboard";
 import NonAuth from "./layout/NonAuth";
 import Root from "./layout/Root";
-import Users from "./pages/users/Users";
+import Users from "./pages/users/users";
 import Restaurants from "./pages/restaurants/Restaurants";
 
 export const router = createBrowserRouter([

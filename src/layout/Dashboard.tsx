@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet } from "react-router-dom";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store";
 import {
   Avatar,
@@ -22,6 +22,7 @@ import { Roles } from "../constants";
 import useLogout from "../hooks/useLogout";
 
 const Dashboard = () => {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuthStore();
   const { logout } = useLogout();
@@ -30,8 +31,14 @@ const Dashboard = () => {
   } = theme.useToken();
 
   const { Header, Content, Footer, Sider } = Layout;
+  console.log(location.pathname);
   if (!user) {
-    return <Navigate to="/auth/login" replace={true} />;
+    return (
+      <Navigate
+        to={`/auth/login?returnTo=${location.pathname}`}
+        replace={true}
+      />
+    );
   }
 
   const getMenuItems = (role: string) => {
