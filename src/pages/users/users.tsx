@@ -16,7 +16,7 @@ import {
   Typography,
 } from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { createUser, getAllUsers } from "../../http/api";
+import { createUser, getAllUsers, updateUser } from "../../http/api";
 import { CreateUserType, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import { PER_PAGE, Roles } from "../../constants";
@@ -42,6 +42,8 @@ const getUsers = async (queryParams: any) => {
 const Users = () => {
   const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editSelected, setEditSelected] = useState(false);
+  const [editableUser, setEditableUser] = useState(0);
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const [queryParams, setQueryParmas] = useState({
@@ -107,11 +109,48 @@ const Users = () => {
         return record.tenant ? record.tenant.name : "No Tenant";
       },
     },
+    {
+      title: "Actions",
+      render: (record: User) => {
+        return (
+          <Space>
+            <Button
+              type="link"
+              onClick={() => {
+                setEditSelected(true);
+                setDrawerOpen(true);
+                setEditableUser(record.id);
+                form.setFieldsValue({
+                  ...record,
+                  tenantId: record.tenant?.id,
+                });
+              }}
+            >
+              Edit
+            </Button>
+          </Space>
+        );
+      },
+    },
   ];
 
   const addUser = async (creatUserData: CreateUserType) => {
     const { data } = await createUser(creatUserData);
     return data;
+  };
+  const updateUserFn = async ({
+    updateUserData,
+    userId,
+  }: {
+    updateUserData: CreateUserType;
+    userId: number;
+  }) => {
+    try {
+      await updateUser(updateUserData, userId);
+      //return data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const { mutate: userMutate } = useMutation({
@@ -124,10 +163,31 @@ const Users = () => {
       return;
     },
   });
+  const { mutate: userUpdateMutate } = useMutation({
+    mutationKey: ["user-update"],
+    mutationFn: updateUserFn,
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDrawerOpen(false);
+      form.resetFields();
+      return;
+    },
+  });
 
   const onHandleSubmit = async () => {
-    await form.validateFields();
-    userMutate(form.getFieldsValue());
+    if (editSelected) {
+      await form.validateFields();
+      userUpdateMutate({
+        updateUserData: form.getFieldsValue(),
+        userId: editableUser,
+      });
+    } else {
+      await form.validateFields();
+      userMutate(form.getFieldsValue());
+    }
+    setEditSelected(false);
+    form.resetFields();
+    setDrawerOpen(false);
   };
 
   const debounceQUpdate = useMemo(() => {
@@ -206,10 +266,11 @@ const Users = () => {
         />
         ;
         <Drawer
-          title="Create user"
+          title={editSelected ? "Edit user" : "Create user"}
           width={720}
           destroyOnClose={true}
           onClose={() => {
+            setEditSelected(false);
             setDrawerOpen(false);
             form.resetFields();
           }}
@@ -236,7 +297,7 @@ const Users = () => {
           }}
         >
           <Form layout="vertical" form={form}>
-            <UserForm />
+            <UserForm isEditSelected={editSelected} />
           </Form>
         </Drawer>
       </Space>

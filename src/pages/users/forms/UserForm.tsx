@@ -5,11 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Tenant } from "../../../types";
 
 const getTenants = async () => {
-  const tenants = await getAllTenants();
-  return tenants.data.tenants;
+  const tenants = await getAllTenants(`perPage=100&currentPage=1`);
+  return tenants.data.data;
 };
 
-const UserForm = () => {
+const UserForm = ({ isEditSelected }: { isEditSelected: boolean }) => {
   const { data: tenantData } = useQuery({
     queryKey: ["tenants"],
     queryFn: getTenants,
@@ -58,21 +58,23 @@ const UserForm = () => {
               </Col>
             </Row>
           </Card>
-          <Card title="Security info">
-            <Row>
-              <Col span={12}>
-                <Form.Item
-                  label="Password"
-                  name="password"
-                  rules={[
-                    { required: true, message: "Password name is required" },
-                  ]}
-                >
-                  <Input type="password" size="large"></Input>
-                </Form.Item>
-              </Col>
-            </Row>
-          </Card>
+          {!isEditSelected && (
+            <Card title="Security info">
+              <Row>
+                <Col span={12}>
+                  <Form.Item
+                    label="Password"
+                    name="password"
+                    rules={[
+                      { required: true, message: "Password name is required" },
+                    ]}
+                  >
+                    <Input type="password" size="large"></Input>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          )}
           <Card title="Role">
             <Row gutter={20}>
               <Col span={12}>
@@ -82,6 +84,7 @@ const UserForm = () => {
                   rules={[{ required: true, message: "Role is required" }]}
                 >
                   <Select
+                    id="selectBoxInuserForm"
                     placeholder="Select role"
                     allowClear={true}
                     style={{ width: "100%" }}
@@ -105,7 +108,7 @@ const UserForm = () => {
                   >
                     {tenantData &&
                       tenantData.map((tenant: Tenant) => (
-                        <Select.Option value={tenant.id}>
+                        <Select.Option value={tenant.id} key={tenant.id}>
                           {tenant.name}
                         </Select.Option>
                       ))}
