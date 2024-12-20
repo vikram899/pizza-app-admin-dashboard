@@ -49,11 +49,6 @@ const Dashboard = () => {
         label: <NavLink to="/">Home</NavLink>,
       },
       {
-        key: "/restaurants",
-        icon: <Icon component={foodIcon}></Icon>,
-        label: <NavLink to="/restaurants">Restaurants</NavLink>,
-      },
-      {
         key: "/products",
         icon: <Icon component={BasketIcon}></Icon>,
         label: <NavLink to="/products">Products</NavLink>,
@@ -72,6 +67,13 @@ const Dashboard = () => {
         icon: <Icon component={UserIcon}></Icon>,
         label: <NavLink to="/users">Users</NavLink>,
       });
+
+      menu.splice(2, 0, {
+        key: "/restaurants",
+        icon: <Icon component={foodIcon}></Icon>,
+        label: <NavLink to="/restaurants">Restaurants</NavLink>,
+      });
+
       return menu;
     }
     return baseItems;
