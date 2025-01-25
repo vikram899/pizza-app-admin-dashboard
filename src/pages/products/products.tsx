@@ -63,6 +63,7 @@ const Products = () => {
   const [queryParams, setQueryParmas] = useState({
     currentPage: 1,
     perPage: PER_PAGE,
+    //Pass tenantId
   });
 
   const getProducts = async (queryParams: any) => {
