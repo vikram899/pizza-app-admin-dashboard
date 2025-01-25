@@ -26,3 +26,6 @@ export const getAllTenants = (queryString: string) =>
   api.get(`${AUTH_SERVICE}/tenants?${queryString}`);
 export const createTenant = (tenantData: CreateTenantType) =>
   api.post(`${AUTH_SERVICE}/tenants`, tenantData);
+
+//Categories
+export const getAllCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
