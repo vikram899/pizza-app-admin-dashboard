@@ -29,3 +29,7 @@ export const createTenant = (tenantData: CreateTenantType) =>
 
 //Categories
 export const getAllCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
+
+//Products
+export const getAllProducts = (queryString: string) =>
+  api.get(`${CATALOG_SERVICE}/products?${queryString}`);
