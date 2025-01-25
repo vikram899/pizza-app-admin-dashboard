@@ -8,6 +8,8 @@ import {
   Typography,
   Tag,
   Spin,
+  Drawer,
+  theme,
 } from "antd";
 import { Link } from "react-router-dom";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
@@ -18,6 +20,7 @@ import { PER_PAGE } from "../../constants";
 import { getAllProducts } from "../../http/api";
 import { FieldData, Product } from "../../types";
 import { debounce } from "lodash";
+import ProductForm from "./forms/ProductForm";
 
 const columns = [
   {
@@ -59,12 +62,17 @@ const columns = [
 ];
 
 const Products = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const [queryParams, setQueryParmas] = useState({
     currentPage: 1,
     perPage: PER_PAGE,
     //Pass tenantId
   });
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
 
   const getProducts = async (queryParams: any) => {
     const filteredParams = Object.fromEntries(
@@ -134,7 +142,13 @@ const Products = () => {
 
         <Form form={filterForm} onFieldsChange={onFilterChange}>
           <ProductFilter>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => {}}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setDrawerOpen(true);
+              }}
+            >
               Add Product
             </Button>
           </ProductFilter>
@@ -161,6 +175,41 @@ const Products = () => {
             },
           }}
         />
+
+        <Drawer
+          title={"Add Product"}
+          width={720}
+          destroyOnClose={true}
+          onClose={() => {
+            setDrawerOpen(false);
+            form.resetFields();
+          }}
+          open={drawerOpen}
+          extra={
+            <Space>
+              <Button
+                onClick={() => {
+                  setDrawerOpen(false);
+                  form.resetFields();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" onClick={() => {}}>
+                Submit
+              </Button>
+            </Space>
+          }
+          styles={{
+            body: {
+              background: colorBgLayout,
+            },
+          }}
+        >
+          <Form layout="vertical" form={form}>
+            <ProductForm />
+          </Form>
+        </Drawer>
       </Space>
     </>
   );
