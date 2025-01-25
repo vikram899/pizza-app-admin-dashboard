@@ -7,9 +7,10 @@ import {
   Image,
   Typography,
   Tag,
+  Spin,
 } from "antd";
 import { Link } from "react-router-dom";
-import { PlusOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import ProductFilter from "./ProductFilter";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -123,6 +124,12 @@ const Products = () => {
             },
           ]}
         ></Breadcrumb>
+        {isFetching && (
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        )}
+        {isError && (
+          <Typography.Text type="danger">{error.message}</Typography.Text>
+        )}
 
         <Form form={filterForm} onFieldsChange={onFilterChange}>
           <ProductFilter>
