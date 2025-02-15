@@ -68,3 +68,6 @@ export interface Attribute {
 export type PricingProps = {
   selectedCategory: string;
 };
+
+export type ImageField = { file: File };
+export type CreateProductData = Product & { image: ImageField };

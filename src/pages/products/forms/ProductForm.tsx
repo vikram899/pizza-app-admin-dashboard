@@ -6,7 +6,6 @@ import {
   Input,
   Select,
   Form,
-  Upload,
   Typography,
   Switch,
 } from "antd";
@@ -14,12 +13,13 @@ import {
 import { Category, Tenant } from "../../../types";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCategories, getAllTenants } from "../../../http/api";
-import { PlusOutlined } from "@ant-design/icons";
 import Pricing from "./Pricing";
 import Attributes from "./Attributes";
+import { FormInstance } from "antd/es/form";
+import ProductImage from "./ProductImage";
 
-const ProductForm = () => {
-  const selectedCategory = Form.useWatch("category");
+const ProductForm = ({ form }: { form: FormInstance }) => {
+  const selectedCategory = Form.useWatch("categoryId");
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -55,7 +55,7 @@ const ProductForm = () => {
               <Col span={12}>
                 <Form.Item
                   label="Category"
-                  name="category"
+                  name="categoryId"
                   rules={[{ required: true, message: "Category is required" }]}
                 >
                   <Select
@@ -67,10 +67,7 @@ const ProductForm = () => {
                   >
                     {categories?.data.map((category: Category) => {
                       return (
-                        <Select.Option
-                          key={category._id}
-                          value={JSON.stringify(category)}
-                        >
+                        <Select.Option key={category._id} value={category._id}>
                           {category.name}
                         </Select.Option>
                       );
@@ -99,18 +96,7 @@ const ProductForm = () => {
           <Card title="Upload Image">
             <Row gutter={20}>
               <Col span={12}>
-                <Form.Item
-                  label="Image"
-                  name="image"
-                  rules={[{ required: true, message: "Image is required" }]}
-                >
-                  <Upload listType="picture-card">
-                    <Space direction="vertical">
-                      <PlusOutlined />
-                      <Typography.Text>Upload</Typography.Text>
-                    </Space>
-                  </Upload>
-                </Form.Item>
+                <ProductImage initialImage={form.getFieldValue("image")} />
               </Col>
             </Row>
           </Card>

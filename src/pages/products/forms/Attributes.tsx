@@ -1,26 +1,38 @@
 import { Card, Col, Form, Radio, Row, Switch, Typography } from "antd";
 import { Category, PricingProps } from "../../../types";
+import { useQuery } from "@tanstack/react-query";
+import { getCategory } from "../../../http/api";
 
 const Attributes = ({ selectedCategory }: PricingProps) => {
-  const category: Category | null = selectedCategory
-    ? JSON.parse(selectedCategory)
-    : null;
+  const { data } = useQuery({
+    queryKey: ["category", selectedCategory],
+    queryFn: () => {
+      return getCategory(selectedCategory).then((res) => res.data);
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
-  if (!category) return;
+  if (!data?.category) return null;
+  const fetchedCategory: Category = data.category;
+
   return (
     <Card
-      title={<Typography.Text>Product price</Typography.Text>}
+      title={<Typography.Text>Attributes</Typography.Text>}
       bordered={false}
     >
-      {category.attributes.map((attribute) => {
+      {fetchedCategory?.attributes?.map((attribute) => {
         return (
           <div key={attribute.name}>
             {attribute.widgetType === "radio" ? (
               <Form.Item
                 label={attribute.name}
                 name={["attributes", attribute.name]}
+                initialValue={attribute.defaultValue}
                 rules={[
-                  { required: true, message: `${attribute.name} is required` },
+                  {
+                    required: true,
+                    message: `${attribute.name} is required`,
+                  },
                 ]}
               >
                 <Radio.Group>
@@ -37,21 +49,12 @@ const Attributes = ({ selectedCategory }: PricingProps) => {
               <Row>
                 <Col>
                   <Form.Item
-                    label={attribute.name}
                     name={["attributes", attribute.name]}
                     valuePropName="checked"
-                    rules={[
-                      {
-                        required: true,
-                        message: `${attribute.name} is required`,
-                      },
-                    ]}
-                    initialValue={true}
+                    label={attribute.name}
+                    initialValue={attribute.defaultValue}
                   >
-                    <Switch
-                      checkedChildren="Yes"
-                      unCheckedChildren="No"
-                    ></Switch>
+                    <Switch checkedChildren="Yes" unCheckedChildren="No" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -64,4 +67,3 @@ const Attributes = ({ selectedCategory }: PricingProps) => {
 };
 
 export default Attributes;
-Attributes;
