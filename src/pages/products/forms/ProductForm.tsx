@@ -136,7 +136,9 @@ const ProductForm = () => {
             </Row>
           </Card>
           {selectedCategory && <Pricing selectedCategory={selectedCategory} />}
-          {selectedCategory && <Attributes />}
+          {selectedCategory && (
+            <Attributes selectedCategory={selectedCategory} />
+          )}
           <Card title="Other properties">
             <Row gutter={24}>
               <Col span={24}>

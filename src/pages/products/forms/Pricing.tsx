@@ -1,15 +1,11 @@
 import { Card, Col, Form, InputNumber, Row, Space, Typography } from "antd";
-import { Category } from "../../../types";
-
-type PricingProps = {
-  selectedCategory: string;
-};
+import { Category, PricingProps } from "../../../types";
 
 const Pricing = ({ selectedCategory }: PricingProps) => {
   const category: Category | null = selectedCategory
     ? JSON.parse(selectedCategory)
     : null;
-  console.log(category);
+
   if (!category) return;
 
   return (

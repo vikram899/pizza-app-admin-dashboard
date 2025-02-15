@@ -64,3 +64,7 @@ export interface Attribute {
   defaultValue: string;
   availableOptions: string[];
 }
+
+export type PricingProps = {
+  selectedCategory: string;
+};
